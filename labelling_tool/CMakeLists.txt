@@ -1,0 +1,5 @@
+cmake_minimum_required (VERSION 2.6)
+project (LabellingTool)
+find_package(OpenCV REQUIRED)
+add_executable(LabellingTool main.cpp)
+target_link_libraries(LabellingTool ${OpenCV_LIBS})
