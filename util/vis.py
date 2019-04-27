@@ -18,14 +18,14 @@ def view_seg_map(img, seg, color=(0, 255, 0), alpha=0.4, include_overlay=False, 
 
     overlay2 = img.copy()
     overlay2[np.where((seg > 0).all(axis = 2))] = color
-    overlay2[overlay2 != color] = (0, 0, 0)
+    overlay2[np.where((overlay2 != color).all(axis = 2))] = (0, 0, 0)
 
     output = img.copy()
     cv2.addWeighted(overlay, alpha, output, 1 - alpha, 0, output)
 
     if include_overlay:
         return output, overlay
-    else if include_mask:
+    elif include_mask:
         return output, overlay2
     else:
         return output
