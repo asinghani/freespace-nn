@@ -45,7 +45,7 @@ valid_data = GeneratorThread([valid_data], max_storage=10).get_iterator()
 model = FloorNet(config, batchnorm=False, aux=True, pyramid=True, upsampling_trainable=True, upsampling_init=True)
 
 #save_location = "/hdd/models/final_floorseg/f{}{}{}{}/".format(1 if aux else 0, 1 if pyramid else 0, 1 if upsampling_trainable else 0, 1 if upsampling_init else 0)
-save_location = "/hdd/models/isef/test/"
+save_location = "/hdd/models/isef/with_aug/"
 
 print(save_location)
 
