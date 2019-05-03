@@ -5,6 +5,7 @@ import random
 from ..config import Config, random_seed
 from ..util.data_loader import load_data
 from ..util.callbacks import SegCallback, SimpleTensorboardCallback, poly_lr
+from ..util.generator_thread import GeneratorThread
 
 from .floornet import FloorNet
 
@@ -31,12 +32,20 @@ try:
 except: # Errors thrown if folder exists
     pass
 
-train_data, test_data, valid_data, mean, stddev = load_data(config)
+train_data1, test_data, valid_data, mean, stddev = load_data(config)
+train_data2, _1, _2, mean, stddev = load_data(config)
+train_data3, _1, _2, mean, stddev = load_data(config)
+train_data4, _1, _2, mean, stddev = load_data(config)
+train_data5, _1, _2, mean, stddev = load_data(config)
+
+train_data = GeneratorThread([train_data1, train_data2, train_data3, train_data4, train_data5], max_storage=500).get_iterator()
+test_data = GeneratorThread([test_data], max_storage=200).get_iterator()
+valid_data = GeneratorThread([valid_data], max_storage=10).get_iterator()
 
 model = FloorNet(config, batchnorm=False, aux=True, pyramid=True, upsampling_trainable=True, upsampling_init=True)
 
 #save_location = "/hdd/models/final_floorseg/f{}{}{}{}/".format(1 if aux else 0, 1 if pyramid else 0, 1 if upsampling_trainable else 0, 1 if upsampling_init else 0)
-save_location = "/hdd/models/isef/fixed_aug_1/"
+save_location = "/hdd/models/isef/test/"
 
 print(save_location)
 

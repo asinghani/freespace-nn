@@ -24,16 +24,16 @@ Augumentations:
 gen = ImageDataGenerator(fill_mode="reflect", dtype=np.float32)
 
 def augment(image, label):
-    rotationAngle = np.random.normal(0.0, 4.0)
-    shearAngle = np.random.normal(0.0, 8.0)
+    rotationAngle = np.random.normal(0.0, 3.0)
+    shearAngle = np.random.normal(0.0, 3.0)
 
-    shiftX = np.random.normal(0.0, 0.08)
-    shiftY = np.random.normal(0.0, 0.08)
+    shiftX = np.random.normal(0.0, 0.03)
+    shiftY = np.random.normal(0.0, 0.03)
 
     zoom = np.random.normal(1.0, 0.04)
     horizFlip = bool(random.getrandbits(1))
 
-    brightness = np.random.normal(0.95, 0.22)
+    brightness = np.random.normal(1.00, 0.12)
 
     out = gen.apply_transform(image * 255.0, {"theta": rotationAngle, "shear": shearAngle, "tx": shiftX, "ty": shiftY, "zx": zoom, "zy": zoom, "flip_horizontal": horizFlip, "brightness": brightness})
     outLabel = gen.apply_transform(label * 255.0, {"theta": rotationAngle, "shear": shearAngle, "tx": shiftX, "ty": shiftY, "zx": zoom, "zy": zoom, "flip_horizontal": horizFlip})

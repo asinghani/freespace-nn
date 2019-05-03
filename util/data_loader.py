@@ -4,6 +4,7 @@ import glob
 import cv2
 import numpy as np
 import matplotlib.image as mpimg
+from sklearn.utils import shuffle
 
 from ..util.vis import img_stats
 from ..config import Config, random_seed
@@ -31,6 +32,8 @@ def load_files(config = Config()):
 
     X = [os.path.join(config.images_location, f) for f in images]
     Y = [os.path.join(config.labels_location, f) for f in images]
+
+    X, Y = shuffle(X, Y)
 
     # Use 20% of the dataset for testing, 80% for training 
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=random_seed)
@@ -75,6 +78,10 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
                 if augment_data:
                     image, label = augment(image, label)
 
+                newLabel = np.zeros([label.shape[0], label.shape[1], 2], dtype=np.float32)
+                newLabel[np.where((label < 0.5).all(axis=2))] = (1, 0)
+                newLabel[np.where((label > 0.5).all(axis=2))] = (0, 1)
+
                 img2 = cv2.cvtColor(image * 255.0, cv2.COLOR_BGR2GRAY)
                 x = cv2.Sobel(img2, cv2.CV_32F, 1, 0, ksize=3)
                 x = cv2.convertScaleAbs(x) / 255.0
@@ -90,7 +97,7 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
 
                 images[i] = 2 * (image - 0.5)
                 images2[i] = 2 * (image2 - 0.5)
-                labels[i] = label
+                labels[i] = newLabel
 
                 # Limit number of images to batch_size
                 i += 1
@@ -116,10 +123,10 @@ def preprocess_label(label, config = Config()):
 def postprocess(image, label, config = Config()):
     # TODO convert data to proper format for neural network (normalize, etc)
     label = cv2.cvtColor(label, cv2.COLOR_RGB2GRAY)[:, :, np.newaxis]
-    newLabel = np.zeros([config.input_shape[0], config.input_shape[1], 2], dtype=np.float32)
+    newLabel = np.zeros([config.input_shape[0], config.input_shape[1], 1], dtype=np.float32)
 
-    newLabel[np.where((label < 0.5).all(axis=2))] = (1, 0)
-    newLabel[np.where((label > 0.5).all(axis=2))] = (0, 1)
+    newLabel[np.where((label < 0.5))] = 0.0
+    newLabel[np.where((label > 0.5))] = 1.0
 
     newImage = np.array(image, dtype=np.float32)
 
