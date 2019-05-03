@@ -33,15 +33,10 @@ except: # Errors thrown if folder exists
 
 train_data, test_data, valid_data, mean, stddev = load_data(config)
 
-aux = (sys.argv[1] == "1")
-pyramid = (sys.argv[2] == "1")
-upsampling_trainable = (sys.argv[3] == "1")
-upsampling_init = (sys.argv[4] == "1")
-
-model = FloorNet(config, batchnorm=False, aux=aux, pyramid=pyramid, upsampling_trainable=upsampling_trainable, upsampling_init=upsampling_init)
+model = FloorNet(config, batchnorm=False, aux=True, pyramid=True, upsampling_trainable=True, upsampling_init=True)
 
 #save_location = "/hdd/models/final_floorseg/f{}{}{}{}/".format(1 if aux else 0, 1 if pyramid else 0, 1 if upsampling_trainable else 0, 1 if upsampling_init else 0)
-save_location = "/hdd/models/final_floorseg/final_noaux/"
+save_location = "/hdd/models/isef/fixed_aug_1/"
 
 print(save_location)
 

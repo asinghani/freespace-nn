@@ -8,7 +8,7 @@ import matplotlib.image as mpimg
 from ..util.vis import img_stats
 from ..config import Config, random_seed
 
-from ..aug.augmentation import augment, augment2
+from ..aug.augmentation import augment
 from ..aug.patchwise import get_patch
 
 def load_data(config = Config()):
@@ -69,6 +69,11 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
             for index in np.random.permutation(len(X)):
 
                 image = X[index]
+                label = Y[index]
+                image, label = postprocess(image, label, config)
+
+                if augment_data:
+                    image, label = augment(image, label)
 
                 img2 = cv2.cvtColor(image * 255.0, cv2.COLOR_BGR2GRAY)
                 x = cv2.Sobel(img2, cv2.CV_32F, 1, 0, ksize=3)
@@ -83,12 +88,6 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
                 image2 = np.concatenate((x, y, z), axis=2)
                 image2 = cv2.resize(image2, (112, 112))
 
-                label = Y[index]
-
-                #image, label = get_patch(config.image_size, image, label, 0.5, 1.2)
-
-                image, label = postprocess(image, label, config)
-
                 images[i] = 2 * (image - 0.5)
                 images2[i] = 2 * (image2 - 0.5)
                 labels[i] = label
@@ -98,8 +97,6 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
                 if i == batch_size:
                     break
 
-            if augment_data:
-                images, images2, labels = augment2(images, images2, labels)
 
             yield [images, images2], labels
 

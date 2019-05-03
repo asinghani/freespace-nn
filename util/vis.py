@@ -32,4 +32,4 @@ def view_seg_map(img, seg, color=(0, 255, 0), alpha=0.4, include_overlay=False, 
 
 def img_stats(img):
     flat = img.flatten()
-    print "Mean = {}, Stddev = {}, Range = {}, Min = {}, Max = {}".format(np.mean(flat), np.std(flat), np.max(flat) - np.min(flat), np.min(flat), np.max(flat))
+    print("Mean = {}, Stddev = {}, Range = {}, Min = {}, Max = {}".format(np.mean(flat), np.std(flat), np.max(flat) - np.min(flat), np.min(flat), np.max(flat)))
