@@ -12,17 +12,17 @@ from ..config import Config, random_seed
 from ..aug.augmentation import augment
 from ..aug.patchwise import get_patch
 
-def load_data(config = Config()):
+def load_data(config = Config(), aug_data = True):
     """
     Loads and prepares data. Returns generators for (train, test)
     """
     X_train, X_test, Y_train, Y_test = load_files(config)
 
-    train_generator, mean, stddev = prepare_data(X_train, Y_train, config.batch_size, True, config)
+    train_generator, mean, stddev = prepare_data(X_train, Y_train, config.batch_size, aug_data, config)
 
     test_generator, _1, _2 = prepare_data(X_test, Y_test, config.test_batch_size, False, config)
 
-    valid_generator, _1, _2 = prepare_data(X_test[::2], Y_test[::2], 1, True, config)
+    valid_generator, _1, _2 = prepare_data(X_test[::2], Y_test[::2], 1, aug_data, config)
 
     return train_generator, test_generator, valid_generator, mean, stddev
 
@@ -82,7 +82,7 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
                 newLabel[np.where((label < 0.5).all(axis=2))] = (1, 0)
                 newLabel[np.where((label > 0.5).all(axis=2))] = (0, 1)
 
-                img2 = cv2.cvtColor(image * 255.0, cv2.COLOR_BGR2GRAY)
+                img2 = cv2.cvtColor(image * 255.0, cv2.COLOR_RGB2GRAY)
                 x = cv2.Sobel(img2, cv2.CV_32F, 1, 0, ksize=3)
                 x = cv2.convertScaleAbs(x) / 255.0
                 x = x.reshape((x.shape[0], x.shape[1], 1))

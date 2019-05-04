@@ -38,5 +38,11 @@ def augment(image, label):
     out = gen.apply_transform(image * 255.0, {"theta": rotationAngle, "shear": shearAngle, "tx": shiftX, "ty": shiftY, "zx": zoom, "zy": zoom, "flip_horizontal": horizFlip, "brightness": brightness})
     outLabel = gen.apply_transform(label * 255.0, {"theta": rotationAngle, "shear": shearAngle, "tx": shiftX, "ty": shiftY, "zx": zoom, "zy": zoom, "flip_horizontal": horizFlip})
 
+    out = cv2.cvtColor(out, cv2.COLOR_RGB2HSV)
+    out[:, :, 0] += np.random.normal(0.0, 6.0)
+    out[:, :, 1] += np.random.normal(0.0, 10.0)
+    out[:, :, 2] += np.random.normal(0.0, 10.0)
+    out = cv2.cvtColor(out, cv2.COLOR_HSV2RGB)
+
     return out / 255.0, outLabel / 255.0
 
