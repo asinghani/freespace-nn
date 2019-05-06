@@ -20,8 +20,8 @@ class Config(object):
         self.train_test_split = 0.1
         self.augment_ratio = 0.5
 
-        self.images_location = "/hdd/datasets/floorseg_carpet/raw"
-        self.labels_location = "/hdd/datasets/floorseg_carpet/labels"
+        self.images_location = "/hdd/datasets/floorseg_small/raw"
+        self.labels_location = "/hdd/datasets/floorseg_small/labels"
 
         self.image_size = (224, 224)
 

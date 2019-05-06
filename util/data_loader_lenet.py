@@ -45,10 +45,10 @@ def load_files(config = Config()):
 def prepare_data(X, Y, batch_size, augment_data, config = Config()):
 
     X = [mpimg.imread(x) for x in X]
-    X = [preprocess_image(cv2.resize(x[int(x.shape[0]):], config.image_size[::-1]), config = config) for x in X]
+    X = [preprocess_image(cv2.resize(x, config.image_size[::-1]), config = config) for x in X]
 
     Y = [mpimg.imread(y) for y in Y]
-    Y = [preprocess_label(cv2.resize(y[int(y.shape[0]):], config.image_size[::-1]), config = config) for y in Y]
+    Y = [preprocess_label(cv2.resize(y, config.image_size[::-1]), config = config) for y in Y]
 
 ########## NO RESIZE #######################################    
     #X = [preprocess_image(mpimg.imread(x), config = config) for x in X]
@@ -65,8 +65,8 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
         while True:
             i = 0
 
-            images = np.empty([batch_size, config.input_shape[0], config.input_shape[1], 3])
-            labels = np.empty([batch_size, config.input_shape[0], config.input_shape[1], 2])
+            images = np.empty([batch_size, 32, 32, 3]) # change to 1 for greyscale
+            labels = np.empty([batch_size, 1])
 
             # Pick random portion of data 
             for index in np.random.permutation(len(X)):
@@ -78,18 +78,18 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
                 if augment_data:
                     image, label = augment(image, label)
 
-                image = np.dot(rgb[...,:3], [0.2989, 0.5870, 0.1140])
+                #image = np.dot(image[...,:3], [0.2989, 0.5870, 0.1140]) # greyscale
 
                 image = 2 * (image - 0.5)
-                image = image.reshape((image.shape[0], image.shape[1], 1))
-                newLabel = newLabel.reshape((newLabel.shape[0], newLabel.shape[1], 1))
-                image = np.stack([image, newLabel], axis=-1)
+                image = image.reshape((image.shape[0], image.shape[1], 3)) # change to 1 for greyscalee
+                newLabel = label.reshape((label.shape[0], label.shape[1], 1))
+                image = np.concatenate([image, newLabel], axis=2)
                 patches = extract_patches_2d(image, (32, 32), max_patches=20)
-                patches_img = patches[:, :, :, 0]
-                patches_label = patches[:, :, :, 1]
+                patches_img = patches[:, :, :, 0:3] # change to 0 and next line 1 for greyscale
+                patches_label = patches[:, :, :, 3]
 
                 for x in range(len(patches)):
-                    images[i] = patches_img[x]
+                    images[i] = patches_img[x].reshape((32, 32, 3)) # change to 1 for greyscale
                     labels[i] = 1.0 if (patches_label[x].flatten().sum() / len(patches_label[x].flatten())) > 0.5 else 0.0
                     i = i + 1
 

@@ -44,10 +44,12 @@ def load_files(config = Config()):
 def prepare_data(X, Y, batch_size, augment_data, config = Config()):
 
     X = [mpimg.imread(x) for x in X]
-    X = [preprocess_image(cv2.resize(x[int(x.shape[0] * 0.375):], config.image_size[::-1]), config = config) for x in X]
+
+    # removed [int(x.shape[0] * 0.375):] from x and y before preprocessing - allows capturing wall better
+    X = [preprocess_image(cv2.resize(x[:, :, 0:3], config.image_size[::-1]), config = config) for x in X]
 
     Y = [mpimg.imread(y) for y in Y]
-    Y = [preprocess_label(cv2.resize(y[int(y.shape[0] * 0.375):], config.image_size[::-1]), config = config) for y in Y]
+    Y = [preprocess_label(cv2.resize(y[:], config.image_size[::-1]), config = config) for y in Y]
 
 ########## NO RESIZE #######################################    
     #X = [preprocess_image(mpimg.imread(x), config = config) for x in X]
@@ -56,8 +58,8 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
     print("Read all data")
 
 
-    mean = np.mean(np.array(X, dtype=np.float32).flatten())
-    stddev = np.std(np.array(X, dtype=np.float32).flatten())
+    mean = 0.0 #np.mean(np.array(X, dtype=np.float32).flatten())
+    stddev = 0.0 # np.std(np.array(X, dtype=np.float32).flatten())
 
     def gen():
         # Generate infinite amount of data

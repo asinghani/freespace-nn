@@ -16,7 +16,8 @@ class GeneratorThread:
         while True:
             self.queue.put(next(iterator))
             if self.queue.qsize() < 5:
-                print("getting bottlenecked, max={}".format(self.max_storage))
+                #print("getting bottlenecked, max={}".format(self.max_storage))
+                pass
 
     def size(self):
         return self.queue.qsize()

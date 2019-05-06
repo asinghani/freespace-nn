@@ -7,7 +7,7 @@ from tensorflow.keras.layers import Conv2D, Flatten, Dense, Add, Input, ZeroPadd
 from tensorflow.keras.models import Model
 
 def LeNet():
-    input = Input(shape=(32, 32, 1))
+    input = Input(shape=(32, 32, 3))
 
     x = input
 

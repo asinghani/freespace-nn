@@ -3,7 +3,7 @@ import os, sys
 import random
 
 from ..config import Config, random_seed
-from ..util.data_loader import load_data
+from ..util.data_loader_lenet import load_data
 from ..util.callbacks import SegCallback, SimpleTensorboardCallback, poly_lr
 from ..util.generator_thread import GeneratorThread
 
@@ -45,18 +45,18 @@ valid_data = GeneratorThread([valid_data], max_storage=10).get_iterator()
 
 model = LeNet()
 
-save_location = "/hdd/models/isef/lenet_patches_monochrome_no_bn/"
+save_location = "/hdd/models/isef/lenet_patches_color_no_bn/"
 
 print(save_location)
 
 checkpoint = K.callbacks.ModelCheckpoint(os.path.join(save_location, "model-{epoch:04d}.h5"), monitor="val_loss", verbose=0, save_best_only=False, mode="auto")
 
-initial_lr = 5.0e-3
+initial_lr = 5.0e-4
 epochs = 2000
 
 csvLogger = K.callbacks.CSVLogger(save_location+"log.csv", append=False, separator=",")
 
-model.compile(loss="mse", optimizer=SGD(lr=initial_lr, momentum=0.9, nesterov=True), metrics=["accuracy"])
+model.compile(loss="binary_crossentropy", optimizer=SGD(lr=initial_lr, momentum=0.9, nesterov=True), metrics=["accuracy"])
 
 with open(save_location+"config.json", "w") as f:
     f.write(config.serialize())
