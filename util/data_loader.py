@@ -71,7 +71,7 @@ def prepare_data(X, Y, batch_size, augment_data, config = Config()):
             labels = np.empty([batch_size, config.input_shape[0], config.input_shape[1], 2])
 
             # Pick random portion of data 
-            for index in np.random.permutation(len(X)):
+            for index in np.concatenate((np.random.permutation(len(X)), np.random.permutation(len(X)))):
 
                 image = X[index]
                 label = Y[index]
