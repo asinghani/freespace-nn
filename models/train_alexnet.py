@@ -3,11 +3,11 @@ import os, sys
 import random
 
 from ..config import Config, random_seed
-from ..util.data_loader_lenet import load_data
+from ..util.data_loader_alexnet import load_data
 from ..util.callbacks import SegCallback, SimpleTensorboardCallback, poly_lr
 from ..util.generator_thread import GeneratorThread
 
-from .lenet_better import LeNet
+from .alexnet import AlexNet
 
 import tensorflow as tf
 from tensorflow import keras as K
@@ -35,17 +35,14 @@ except: # Errors thrown if folder exists
 aug = True
 train_data1, test_data, valid_data, mean, stddev = load_data(config, aug_data=aug)
 train_data2, _1, _2, mean, stddev = load_data(config, aug_data=aug)
-train_data3, _1, _2, mean, stddev = load_data(config, aug_data=aug)
-train_data4, _1, _2, mean, stddev = load_data(config, aug_data=aug)
-train_data5, _1, _2, mean, stddev = load_data(config, aug_data=aug)
 
-train_data = GeneratorThread([train_data1, train_data2, train_data3, train_data4, train_data5], max_storage=1000).get_iterator()
+train_data = GeneratorThread([train_data1, train_data2], max_storage=500).get_iterator()
 test_data = GeneratorThread([test_data], max_storage=200).get_iterator()
 valid_data = GeneratorThread([valid_data], max_storage=10).get_iterator()
 
-model = LeNet()
+model = AlexNet()
 
-save_location = "/hdd/models/isef/lenet_better/"
+save_location = "/hdd/models/isef/alexnet/"
 
 print(save_location)
 
