@@ -21,12 +21,12 @@ config.image_size = (224, 224)
 config.input_shape = (config.image_size[0], config.image_size[1], 3)
 
 model = FloorNet(config)
-model.load_weights("/hdd/models/final_floorseg/final/model-0999.h5")
+model.load_weights("/hdd/models/isef/sgd_carpetonly_nocrop/model-1999.h5")
 
-img = cv2.imread("/hdd/datasets/floorseg/raw/image00132.png")
+img = cv2.imread("/hdd/vis/floordown.png")
 
 # preprocessing
-img = cv2.resize(img[int(img.shape[0] * 0.375):], (224, 224))
+img = cv2.resize(img, (224, 224))
 img2 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 x = cv2.Sobel(img2, cv2.CV_32F, 1, 0, ksize=3)
 x = cv2.convertScaleAbs(x) / 255.0
@@ -66,7 +66,7 @@ for x in range(len(activations)):
     #fig.subplots_adjust(right=0.8)
     #cbar = fig.add_axes([0.85, 0.15, 0.03, 0.7])
     #fig.colorbar(hmap, cax=cbar)
-    plt.savefig('/hdd/temp/layer{}_{}.png'.format(str(x).zfill(3), layer_name), bbox_inches='tight')
+    plt.savefig('/hdd/vis/layers/layer_{}_{}.png'.format(str(x).zfill(3), layer_name), bbox_inches='tight')
     plt.close(fig)
 
 print(activations[15])

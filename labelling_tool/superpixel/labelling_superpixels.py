@@ -41,7 +41,7 @@ def reload():
         plt.draw()
 
     _image = cv2.imread(images[index])[:, :, ::-1]
-    segments = slic(_image / 255.0, n_segments = 400, sigma = 0)
+    segments = slic(cv2.cvtColor(_image, cv2.COLOR_BGR2RGB) / 255.0, n_segments = 600, sigma = 0)
     image = _image
     freespace = set()
 
