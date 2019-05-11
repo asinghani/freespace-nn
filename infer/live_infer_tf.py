@@ -3,13 +3,10 @@ import cv2
 import tensorflow as tf
 
 from threading import Thread
-from tensorflow.keras.models import load_model
-from tensorflow.keras.backend import set_session, set_floatx
-from tensorflow.keras.layers import DepthwiseConv2D
+import tensorflow.keras.backend as K
 
 from ..config import Config
 from ..util.vis import view_seg_map
-from ..models.floornet import FloorNet
 
 import time
 millis = lambda: int(round(time.time() * 1000))
@@ -43,16 +40,23 @@ class CameraThread:
 cap = CameraThread(1, size=(480, 270))
 cap.start()
 
+
+with tf.gfile.FastGFile("/home/ubuntu/model-floornet-trt.pb", "rb") as f:
+    trt_graph = tf.GraphDef()
+    trt_graph.ParseFromString(f.read())
+
 tf_config = tf.ConfigProto()
 tf_config.gpu_options.allow_growth = True
-session = tf.Session(config=tf_config)
-set_session(session)
+sess = tf.Session(config=tf_config)
+tf.import_graph_def(trt_graph, name="")
 
-config = Config()
-model = FloorNet(config)
-model.load_weights("/home/ubuntu/model-floornet.h5")
+input_tensor_name = "input_1:0"
+aux_input_tensor_name = "input_2:0"
+
+output_tensor = sess.graph.get_tensor_by_name("decoder_softmax/truediv:0")
 
 while True:
+    t = millis()
     frame = cap.read()
 
     img = frame
@@ -73,12 +77,24 @@ while True:
     nnInput = np.array(img, dtype=np.float32) / 255.0
 
     nnInput = 2 * (nnInput - 0.5)
+    nnInput = nnInput[:, :, ::-1].reshape((1, 224, 224, 3))
     image2 = 2 * (image2 - 0.5)
+    image2 = image2.reshape((1, 112, 112, 3))
 
-    data = model.predict([nnInput[:, :, ::-1].reshape((1, 224, 224, 3)), image2.reshape((1, 112, 112, 3))])
+    print(millis() - t)
+    t = millis()
+
+    data = sess.run(output_tensor, {input_tensor_name: nnInput, aux_input_tensor_name: image2})
+    #data = model.predict([nnInput[:, :, ::-1].reshape((1, 224, 224, 3)), image2.reshape((1, 112, 112, 3))])
+
+    print(millis() - t)
+    t = millis()
+
     seg = data[0].argmax(axis=2).astype(np.float32)
-
     vis = view_seg_map(cv2.resize(cap.read(), (224, 224)), seg, color=(0, 255, 0), alpha=0.3)
-
     cv2.imshow("Image", vis)
     cv2.waitKey(5)
+
+    print(millis() - t)
+    print()
+    print()
